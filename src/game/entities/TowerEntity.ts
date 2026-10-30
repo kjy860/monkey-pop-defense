@@ -1,16 +1,4 @@
-export interface TowerEntity {
-  id: string;
-  type: 'dart' | 'tack' | 'bomb' | 'ice';
-  x: number;
-  y: number;
-  range: number;
-  damage: number;
-  attackSpeed: number;
-  level: number;
-  totalInvested: number;
-  lastAttackTime: number;
-  angle?: number;
-}
+import { TowerEntity } from '../../types/game';
 
 export function drawTower(ctx: CanvasRenderingContext2D, tower: TowerEntity, isSelected: boolean) {
   ctx.save();
@@ -39,7 +27,7 @@ export function drawTower(ctx: CanvasRenderingContext2D, tower: TowerEntity, isS
     ctx.setLineDash([]);
   }
 
-  // 얼음 타워 눈보라 오라 (Lv.3)
+  // 얼음 타워 눈보라 오라 (Lv.3) 또는 마법사 용오름 오라
   if (tower.type === 'ice' && tower.level === 3) {
     ctx.beginPath();
     ctx.arc(0, 0, tower.range * 0.8, 0, Math.PI * 2);
@@ -47,6 +35,14 @@ export function drawTower(ctx: CanvasRenderingContext2D, tower: TowerEntity, isS
     ctx.fill();
     ctx.strokeStyle = 'rgba(72, 202, 228, 0.4)';
     ctx.lineWidth = 1.5;
+    ctx.stroke();
+  } else if (tower.type === 'wizard' && tower.level === 3) {
+    ctx.beginPath();
+    ctx.arc(0, 0, tower.range * 0.85, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(217, 4, 41, 0.1)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(217, 4, 41, 0.5)';
+    ctx.lineWidth = 2;
     ctx.stroke();
   }
 
@@ -62,6 +58,9 @@ export function drawTower(ctx: CanvasRenderingContext2D, tower: TowerEntity, isS
   if (tower.type === 'tack') emoji = '📌';
   else if (tower.type === 'bomb') emoji = '💣';
   else if (tower.type === 'ice') emoji = '❄️';
+  else if (tower.type === 'boomerang') emoji = '🪃';
+  else if (tower.type === 'sniper') emoji = '🔭';
+  else if (tower.type === 'wizard') emoji = '🧙‍♂️';
   else if (tower.type === 'dart') emoji = '🎯';
 
   ctx.font = '20px sans-serif';

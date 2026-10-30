@@ -2,7 +2,7 @@ export type Difficulty = 'easy' | 'normal' | 'hard';
 
 export type MapThemeId = 'grass' | 'desert' | 'volcano';
 
-export type TowerType = 'dart' | 'tack' | 'bomb' | 'ice';
+export type TowerType = 'dart' | 'tack' | 'bomb' | 'ice' | 'boomerang' | 'sniper' | 'wizard';
 
 export type BalloonType = 'red' | 'blue' | 'green' | 'yellow' | 'lead' | 'ceramic' | 'moab' | 'bfb' | 'zomg';
 
@@ -40,6 +40,8 @@ export interface Tower {
   angle?: number; // 압정 타워 등 시각적 회전용
 }
 
+export type TowerEntity = Tower;
+
 export interface Balloon {
   id: string;
   type: BalloonType;
@@ -71,6 +73,10 @@ export interface Projectile {
   targetBalloonId?: string;
   dx?: number;
   dy?: number;
+  isLaser?: boolean; // 저격수 레이저 이펙트용
+  isBoomerang?: boolean; // 부메랑 궤적용
+  angle?: number;
+  returnPath?: boolean;
 }
 
 export interface Particle {

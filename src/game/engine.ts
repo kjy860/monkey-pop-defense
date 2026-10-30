@@ -3,7 +3,7 @@ import { BalloonEntity, createBalloon, updateBalloonPosition } from './entities/
 import { updateProjectiles } from './entities/ProjectileEntity';
 import { createParticles, updateParticles } from './entities/ParticleEntity';
 import { getWaveSpawns, getFreeplayMultiplier } from './waveData';
-import { BALLOON_SPECS } from './constants';
+import { BALLOON_SPECS, TOWER_SPECS } from './constants';
 import { distance } from './collision';
 import { soundSynth } from '../audio/soundSynth';
 
@@ -184,6 +184,90 @@ export class GameEngine {
             for (let i = 0; i < 10; i++) {
               this.particles.push(...createParticles(tower.x, tower.y, '#48CAE4', 1));
             }
+          }
+        } else if (tower.type === 'sniper') {
+          // 저격수: 맵 어디든 적 1마리 즉시 명중 (Lv3 최대 3마리 관통)
+          let target: BalloonEntity | null = null;
+          for (const b of this.balloons) {
+            target = b;
+            break; // 첫 번째 타겟
+          }
+          if (target) {
+            tower.lastAttackTime = now;
+            soundSynth.playPop(0.5);
+            this.projectiles.push({
+              id: `proj_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+              x: tower.x,
+              y: tower.y,
+              targetX: target.x,
+              targetY: target.y,
+              speed: 9999,
+              damage: tower.damage,
+              isSharp: true,
+              isExplosive: false,
+              blastRadius: 0,
+              targetBalloonId: target.id,
+              isLaser: true,
+            });
+            this.particles.push(...createParticles(target.x, target.y, '#FFB703', 6));
+          }
+        } else if (tower.type === 'boomerang') {
+          let target: BalloonEntity | null = null;
+          for (const b of this.balloons) {
+            if (distance(tower.x, tower.y, b.x, b.y) <= tower.range) {
+              target = b;
+              break;
+            }
+          }
+          if (target) {
+            tower.lastAttackTime = now;
+            soundSynth.playPop(1.4);
+            const count = tower.level >= 2 ? 2 : 1;
+            for (let i = 0; i < count; i++) {
+              const ang = Math.atan2(target.y - tower.y, target.x - tower.x) + (i * 0.3);
+              this.projectiles.push({
+                id: `proj_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+                x: tower.x,
+                y: tower.y,
+                targetX: tower.x + Math.cos(ang) * tower.range,
+                targetY: tower.y + Math.sin(ang) * tower.range,
+                speed: 450,
+                damage: tower.damage,
+                isSharp: true,
+                isExplosive: false,
+                blastRadius: 0,
+                isBoomerang: true,
+                dx: Math.cos(ang),
+                dy: Math.sin(ang),
+              });
+            }
+          }
+        } else if (tower.type === 'wizard') {
+          let target: BalloonEntity | null = null;
+          for (const b of this.balloons) {
+            if (distance(tower.x, tower.y, b.x, b.y) <= tower.range) {
+              target = b;
+              break;
+            }
+          }
+          if (target) {
+            tower.lastAttackTime = now;
+            soundSynth.playPop(1.8);
+            const projId = `proj_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
+            this.projectiles.push({
+              id: projId,
+              x: tower.x,
+              y: tower.y,
+              targetX: target.x,
+              targetY: target.y,
+              speed: 400,
+              damage: tower.damage,
+              isSharp: false,
+              isExplosive: tower.level >= 2,
+              blastRadius: tower.level >= 2 ? 60 : 25,
+              targetBalloonId: target.id,
+            });
+            this.particles.push(...createParticles(target.x, target.y, '#D90429', 5));
           }
         } else {
           // 다트 및 폭탄 타워
@@ -400,6 +484,14 @@ export class GameEngine {
         this.ctx.strokeStyle = 'rgba(72, 202, 228, 0.4)';
         this.ctx.lineWidth = 1.5;
         this.ctx.stroke();
+      } else if (tower.type === 'wizard' && tower.level === 3) {
+        this.ctx.beginPath();
+        this.ctx.arc(0, 0, tower.range * 0.85, 0, Math.PI * 2);
+        this.ctx.fillStyle = 'rgba(217, 4, 41, 0.1)';
+        this.ctx.fill();
+        this.ctx.strokeStyle = 'rgba(217, 4, 41, 0.5)';
+        this.ctx.lineWidth = 2;
+        this.ctx.stroke();
       }
 
       this.ctx.beginPath();
@@ -414,6 +506,9 @@ export class GameEngine {
       if (tower.type === 'tack') emoji = '📌';
       else if (tower.type === 'bomb') emoji = '💣';
       else if (tower.type === 'ice') emoji = '❄️';
+      else if (tower.type === 'boomerang') emoji = '🪃';
+      else if (tower.type === 'sniper') emoji = '🔭';
+      else if (tower.type === 'wizard') emoji = '🧙‍♂️';
       else if (tower.type === 'dart') emoji = '🎯';
 
       this.ctx.font = '20px sans-serif';
@@ -477,8 +572,8 @@ export class GameEngine {
     for (const proj of this.projectiles) {
       this.ctx.save();
       this.ctx.beginPath();
-      this.ctx.arc(proj.x, proj.y, proj.isExplosive ? 6 : proj.isShard ? 5 : 4, 0, Math.PI * 2);
-      this.ctx.fillStyle = proj.isExplosive ? '#D90429' : proj.isShard ? '#FFB703' : '#FFFFFF';
+      this.ctx.arc(proj.x, proj.y, proj.isExplosive ? 6 : proj.isShard ? 5 : proj.isBoomerang ? 7 : 5, 0, Math.PI * 2);
+      this.ctx.fillStyle = proj.isExplosive ? '#D90429' : proj.isShard ? '#FFB703' : proj.isBoomerang ? '#E76F51' : '#FFFFFF';
       this.ctx.fill();
       this.ctx.strokeStyle = '#000000';
       this.ctx.lineWidth = 1;

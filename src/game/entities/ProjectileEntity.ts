@@ -1,6 +1,5 @@
 import { Projectile, Balloon } from '../../types/game';
 import { checkCircleCollision, distance } from '../collision';
-import { BALLOON_SPECS } from '../constants';
 import { soundSynth } from '../../audio/soundSynth';
 
 export function updateProjectiles(
@@ -18,12 +17,23 @@ export function updateProjectiles(
     let targetX = proj.targetX;
     let targetY = proj.targetY;
 
-    if (proj.targetBalloonId && !proj.isExplosive && !proj.isShard) {
+    if (proj.targetBalloonId && !proj.isExplosive && !proj.isShard && !proj.isLaser) {
       const targetB = balloons.find((b) => b.id === proj.targetBalloonId);
       if (targetB) {
         targetX = targetB.x;
         targetY = targetB.y;
       }
+    }
+
+    if (proj.isLaser) {
+      // 저격수 레이저는 즉시 명중 처리 후 소멸
+      for (const b of balloons) {
+        if (distance(proj.x, proj.y, b.x, b.y) <= 30 || proj.targetBalloonId === b.id) {
+          onBalloonDamage(b.id, proj.damage, proj.isSharp);
+          break;
+        }
+      }
+      continue; // 즉시 제거
     }
 
     const dx = targetX - proj.x;
@@ -59,10 +69,10 @@ export function updateProjectiles(
       } else {
         let hit = false;
         for (const b of balloons) {
-          if (checkCircleCollision(proj.x, proj.y, 6, b.x, b.y, 16)) {
+          if (checkCircleCollision(proj.x, proj.y, 8, b.x, b.y, 18)) {
             onBalloonDamage(b.id, proj.damage, proj.isSharp);
             hit = true;
-            break;
+            if (!proj.isBoomerang) break; // 부메랑은 관통 가능
           }
         }
       }
@@ -78,10 +88,10 @@ export function updateProjectiles(
       let hit = false;
       if (!proj.isExplosive) {
         for (const b of balloons) {
-          if (checkCircleCollision(proj.x, proj.y, 6, b.x, b.y, 16)) {
+          if (checkCircleCollision(proj.x, proj.y, 8, b.x, b.y, 18)) {
             onBalloonDamage(b.id, proj.damage, proj.isSharp);
             hit = true;
-            break;
+            if (!proj.isBoomerang) break;
           }
         }
       }
@@ -99,8 +109,8 @@ export function drawProjectiles(ctx: CanvasRenderingContext2D, projectiles: Proj
   ctx.save();
   for (const proj of projectiles) {
     ctx.beginPath();
-    ctx.arc(proj.x, proj.y, proj.isExplosive ? 6 : proj.isShard ? 5 : 4, 0, Math.PI * 2);
-    ctx.fillStyle = proj.isExplosive ? '#D90429' : proj.isShard ? '#FFB703' : '#FFFFFF';
+    ctx.arc(proj.x, proj.y, proj.isExplosive ? 6 : proj.isShard ? 5 : proj.isBoomerang ? 7 : 5, 0, Math.PI * 2);
+    ctx.fillStyle = proj.isExplosive ? '#D90429' : proj.isShard ? '#FFB703' : proj.isBoomerang ? '#E76F51' : '#FFFFFF';
     ctx.fill();
     ctx.strokeStyle = '#000000';
     ctx.lineWidth = 1;

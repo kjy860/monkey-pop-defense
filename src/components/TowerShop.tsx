@@ -3,7 +3,7 @@ import { useGameStore } from '../store/useGameStore';
 import { TOWER_SPECS } from '../game/constants';
 import { TowerType } from '../types/game';
 import { soundSynth } from '../audio/soundSynth';
-import { Shield, Zap, TrendingUp, DollarSign, Trash2, Crosshair } from 'lucide-react';
+import { TrendingUp, Trash2 } from 'lucide-react';
 
 export default function TowerShop() {
   const {
@@ -23,7 +23,7 @@ export default function TowerShop() {
   } = useGameStore();
 
   const selectedTower = towers.find((t) => t.id === selectedTowerId);
-  const towerTypes: TowerType[] = ['dart', 'tack', 'bomb', 'ice'];
+  const towerTypes: TowerType[] = ['dart', 'tack', 'bomb', 'ice', 'boomerang', 'sniper', 'wizard'];
 
   const getTowerCost = (type: TowerType) => {
     return Math.round(TOWER_SPECS[type].baseCost * mapConfig.towerCostMultiplier);
@@ -100,17 +100,25 @@ export default function TowerShop() {
           </div>
         )}
 
-        {/* 중단 패널: 타워 4종 상점 카드 */}
+        {/* 중단 패널: 타워 7종 상점 카드 그리드 스크롤 */}
         <div className="space-y-2.5">
           <h3 className="text-emerald-300 font-bold text-sm tracking-wider uppercase">
-            타워 구매 (단축키 1~4)
+            타워 7종 상점 (단축키 1~4 등)
           </h3>
-          <div className="grid grid-cols-1 gap-2.5">
+          <div className="grid grid-cols-1 gap-2 max-h-[300px] overflow-y-auto pr-1">
             {towerTypes.map((type, idx) => {
               const spec = TOWER_SPECS[type];
               const cost = getTowerCost(type);
               const isAffordable = gold >= cost;
               const isSelected = selectedTowerType === type;
+
+              let emoji = '🎯';
+              if (type === 'tack') emoji = '📌';
+              else if (type === 'bomb') emoji = '💣';
+              else if (type === 'ice') emoji = '❄️';
+              else if (type === 'boomerang') emoji = '🪃';
+              else if (type === 'sniper') emoji = '🔭';
+              else if (type === 'wizard') emoji = '🧙‍♂️';
 
               return (
                 <button
@@ -118,7 +126,7 @@ export default function TowerShop() {
                   onClick={() => {
                     setSelectedTowerType(isSelected ? null : type);
                   }}
-                  className={`flex items-center justify-between p-3 rounded-xl border transition-all text-left ${
+                  className={`flex items-center justify-between p-2.5 rounded-xl border transition-all text-left ${
                     isSelected
                       ? 'bg-emerald-700 border-amber-400 ring-2 ring-amber-400 shadow-lg'
                       : isAffordable
@@ -126,22 +134,24 @@ export default function TowerShop() {
                       : 'bg-gray-900/60 border-gray-800 opacity-60 cursor-not-allowed'
                   }`}
                 >
-                  <div className="flex items-center space-x-3">
-                    <span className="text-2xl p-1 bg-emerald-950 rounded-lg border border-emerald-700/50">
-                      {type === 'dart' ? '🎯' : type === 'tack' ? '📌' : type === 'bomb' ? '💣' : '❄️'}
+                  <div className="flex items-center space-x-2.5">
+                    <span className="text-xl p-1 bg-emerald-950 rounded-lg border border-emerald-700/50">
+                      {emoji}
                     </span>
                     <div>
                       <div className="flex items-center space-x-1.5">
-                        <span className="font-bold text-sm text-white">{spec.name}</span>
-                        <span className="text-[10px] bg-emerald-950 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-800">
-                          [{idx + 1}]
-                        </span>
+                        <span className="font-bold text-xs text-white">{spec.name}</span>
+                        {idx < 4 && (
+                          <span className="text-[10px] bg-emerald-950 text-emerald-300 px-1 py-0.2 rounded border border-emerald-800">
+                            [{idx + 1}]
+                          </span>
+                        )}
                       </div>
-                      <p className="text-[11px] text-emerald-200/70 line-clamp-1">{spec.description}</p>
+                      <p className="text-[10px] text-emerald-200/70 line-clamp-1">{spec.description}</p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <span className={`font-bold text-sm ${isAffordable ? 'text-gold' : 'text-red-400'}`}>
+                    <span className={`font-bold text-xs ${isAffordable ? 'text-gold' : 'text-red-400'}`}>
                       {cost}G
                     </span>
                   </div>

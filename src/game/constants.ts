@@ -11,7 +11,10 @@ export interface TowerSpec {
   lv3Desc: string;
 }
 
-export const TOWER_SPECS: Record<'dart' | 'tack' | 'bomb' | 'ice', TowerSpec> = {
+export const TOWER_SPECS: Record<
+  'dart' | 'tack' | 'bomb' | 'ice' | 'boomerang' | 'sniper' | 'wizard',
+  TowerSpec
+> = {
   dart: {
     name: '다트 원숭이',
     baseCost: 200,
@@ -22,12 +25,12 @@ export const TOWER_SPECS: Record<'dart' | 'tack' | 'bomb' | 'ice', TowerSpec> = 
     lv2Cost: 120,
     lv2Desc: '사거리 150px, 투사체 크기 1.2배 및 궤적 잔상 이펙트 추가',
     lv3Cost: 220,
-    lv3Desc: '발사 간격 0.4초로 단축, 양쪽으로 작은 다트 2발 추가 발사(총 3발 산탄) 및 회전 이펙트',
+    lv3Desc: '발사 간격 0.4초로 단축, 양쪽으로 작은 다트 2발 추가 발사(총 3발 산탄) 및 화려한 회전 이펙트',
   },
   tack: {
     name: '압정 타워',
     baseCost: 280,
-    range: 75,
+    range: 85,
     attackSpeed: 1.1,
     damage: 1,
     description: '주변 사방으로 압정을 뿜어내어 다수의 풍선을 공격합니다.',
@@ -38,27 +41,63 @@ export const TOWER_SPECS: Record<'dart' | 'tack' | 'bomb' | 'ice', TowerSpec> = 
   },
   bomb: {
     name: '폭탄 타워',
-    baseCost: 350,
+    baseCost: 380,
     range: 130,
     attackSpeed: 1.5,
     damage: 2,
     description: '광역 폭발 유탄을 발사합니다. 납 풍선을 파괴할 수 있습니다.',
-    lv2Cost: 200,
+    lv2Cost: 220,
     lv2Desc: '폭발 반경 95px, 폭발 시 주황색 화염 파티클 12개 비산',
-    lv3Cost: 420,
+    lv3Cost: 450,
     lv3Desc: '피해량 4, 거대한 네이팜 폭발 이펙트와 함께 주변에 2차 파편 6개 비산 및 화면 미세 진동',
   },
   ice: {
     name: '얼음 원숭이',
-    baseCost: 300,
+    baseCost: 320,
     range: 85,
     attackSpeed: 2.0,
     damage: 0,
     description: '냉기 파동으로 범위 내 풍선을 1.5초간 빙결 정지시킵니다.',
-    lv2Cost: 180,
+    lv2Cost: 200,
     lv2Desc: '사거리 110px, 빙결 시간 2.0초, 서리 결정 크리스탈 파티클 확장',
-    lv3Cost: 350,
+    lv3Cost: 380,
     lv3Desc: '서리 파편(빙결 해제 시 피해량 1), 타워 주변에 눈보라 오라 지속 이펙트 렌더링',
+  },
+  boomerang: {
+    name: '부메랑 원숭이',
+    baseCost: 300,
+    range: 140,
+    attackSpeed: 1.2,
+    damage: 2,
+    description: '곡선 궤도로 적을 관통 공격하는 부메랑을 던집니다.',
+    lv2Cost: 180,
+    lv2Desc: '사거리 170px, 부메랑 2개 동시 회전 발사',
+    lv3Cost: 350,
+    lv3Desc: '거대한 불타는 화염 부메랑이 넓은 호를 그리며 다중 적 다단 히트',
+  },
+  sniper: {
+    name: '저격수 원숭이',
+    baseCost: 500,
+    range: 9999, // 전면 무한
+    attackSpeed: 2.2,
+    damage: 3,
+    description: '맵 어디든 즉시 명중하는 저격 탄환을 발사합니다 (납 파괴 불가).',
+    lv2Cost: 300,
+    lv2Desc: '발사 간격 1.4초, 피해량 5로 증가',
+    lv3Cost: 600,
+    lv3Desc: '관통 탄환 장착, 일직선 상의 적 최대 3마리 동시 관통 타격 및 레이저 레이스 이펙트',
+  },
+  wizard: {
+    name: '마법사 원숭이',
+    baseCost: 450,
+    range: 110,
+    attackSpeed: 1.0,
+    damage: 2,
+    description: '유도 화염구를 발사하여 납과 세라믹 풍선을 강력하게 제압합니다.',
+    lv2Cost: 250,
+    lv2Desc: '화염구 폭발 범위 추가 및 화염 지속 도트 데미지(Burn)',
+    lv3Cost: 500,
+    lv3Desc: '거대한 용오름 마법 폭풍 소환, 범위 내 모든 풍선을 연속 타격하는 드래곤 브레스 이펙트',
   },
 };
 
@@ -78,7 +117,7 @@ export const BALLOON_SPECS: Record<string, BalloonSpec> = {
     name: '빨강 풍선',
     hp: 1,
     speed: 1.0,
-    gold: 2, // 상향된 골드 경제
+    gold: 2,
     children: null,
     childrenCount: 0,
     isImmuneToSharp: false,

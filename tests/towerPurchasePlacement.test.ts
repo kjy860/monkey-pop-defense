@@ -8,16 +8,16 @@ describe('타워 구매, 배치, 업그레이드 및 판매 검증', () => {
     useGameStore.getState().initGame('normal');
   });
 
-  it('보통 난이도 초기 골드 600G에서 다트 원숭이(200G) 구매 시 골드가 400G로 감소하고 타워가 배치된다.', () => {
+  it('보통 난이도 초기 골드 850G에서 다트 원숭이(200G) 구매 시 골드가 650G로 감소하고 타워가 배치된다.', () => {
     const store = useGameStore.getState();
-    expect(store.gold).toBe(600);
+    expect(store.gold).toBe(850);
     expect(store.towers.length).toBe(0);
 
     const success = store.placeTower('dart', 400, 100);
     expect(success).toBe(true);
 
     const updatedStore = useGameStore.getState();
-    expect(updatedStore.gold).toBe(400);
+    expect(updatedStore.gold).toBe(650);
     expect(updatedStore.towers.length).toBe(1);
     expect(updatedStore.towers[0].type).toBe('dart');
     expect(updatedStore.towers[0].level).toBe(1);
@@ -42,7 +42,7 @@ describe('타워 구매, 배치, 업그레이드 및 판매 검증', () => {
     const store = useGameStore.getState();
     store.placeTower('dart', 400, 100);
     const towerId = useGameStore.getState().towers[0].id;
-    const goldBeforeUpgrade = useGameStore.getState().gold; // 400G
+    const goldBeforeUpgrade = useGameStore.getState().gold; // 650G
 
     const upgradeSuccess = store.upgradeTower(towerId);
     expect(upgradeSuccess).toBe(true);
