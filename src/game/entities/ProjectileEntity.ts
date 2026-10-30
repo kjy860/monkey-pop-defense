@@ -2,7 +2,6 @@ import { Projectile, Balloon } from '../../types/game';
 import { checkCircleCollision, distance } from '../collision';
 import { BALLOON_SPECS } from '../constants';
 import { soundSynth } from '../../audio/soundSynth';
-import { createBalloon } from './BalloonEntity';
 
 export function updateProjectiles(
   projectiles: Projectile[],
@@ -52,9 +51,8 @@ export function updateProjectiles(
         }
 
         if (proj.damage >= 4) {
-          const angles = [0, Math.PI / 2, Math.PI, (3 * Math.PI) / 2];
-          for (let i = 0; i < 4; i++) {
-            const angle = angles[i];
+          const angles = [0, Math.PI / 3, (2 * Math.PI) / 3, Math.PI, (4 * Math.PI) / 3, (5 * Math.PI) / 3];
+          for (const angle of angles) {
             spawnShard(proj.x, proj.y, Math.cos(angle), Math.sin(angle), 1);
           }
         }
@@ -101,7 +99,7 @@ export function drawProjectiles(ctx: CanvasRenderingContext2D, projectiles: Proj
   ctx.save();
   for (const proj of projectiles) {
     ctx.beginPath();
-    ctx.arc(proj.x, proj.y, proj.isExplosive ? 6 : 4, 0, Math.PI * 2);
+    ctx.arc(proj.x, proj.y, proj.isExplosive ? 6 : proj.isShard ? 5 : 4, 0, Math.PI * 2);
     ctx.fillStyle = proj.isExplosive ? '#D90429' : proj.isShard ? '#FFB703' : '#FFFFFF';
     ctx.fill();
     ctx.strokeStyle = '#000000';

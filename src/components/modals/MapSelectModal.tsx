@@ -20,7 +20,6 @@ export default function MapSelectModal() {
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full mb-8">
-          {/* 쉬움 카드 */}
           <div 
             onClick={() => handleSelect('easy')}
             className="bg-emerald-900/80 hover:bg-emerald-800 border-2 border-emerald-500/60 hover:border-emerald-400 rounded-xl p-6 cursor-pointer transition-all transform hover:-translate-y-1 shadow-lg flex flex-col items-center text-center group"
@@ -30,13 +29,12 @@ export default function MapSelectModal() {
             <span className="text-xs uppercase px-2 py-0.5 bg-emerald-700 text-emerald-200 rounded-full mb-4">쉬움 (Easy)</span>
             <ul className="text-xs text-emerald-300 space-y-1 text-left w-full bg-emerald-950/60 p-3 rounded-lg border border-emerald-800">
               <li>• 긴 단일 S자 곡선 경로</li>
-              <li>• 시작 골드: 650G</li>
+              <li>• 시작 골드: 750G</li>
               <li>• 초기 체력: 150 HP</li>
               <li>• 적 이동속도: 90%</li>
             </ul>
           </div>
 
-          {/* 보통 카드 */}
           <div 
             onClick={() => handleSelect('normal')}
             className="bg-emerald-900/80 hover:bg-emerald-800 border-2 border-amber-500/60 hover:border-amber-400 rounded-xl p-6 cursor-pointer transition-all transform hover:-translate-y-1 shadow-lg flex flex-col items-center text-center group"
@@ -46,13 +44,12 @@ export default function MapSelectModal() {
             <span className="text-xs uppercase px-2 py-0.5 bg-amber-700 text-amber-200 rounded-full mb-4">보통 (Normal)</span>
             <ul className="text-xs text-amber-300 space-y-1 text-left w-full bg-emerald-950/60 p-3 rounded-lg border border-emerald-800">
               <li>• 2중 루프 교차 사격 맵</li>
-              <li>• 시작 골드: 500G</li>
+              <li>• 시작 골드: 600G</li>
               <li>• 초기 체력: 100 HP</li>
               <li>• 적 이동속도: 100%</li>
             </ul>
           </div>
 
-          {/* 어려움 카드 */}
           <div 
             onClick={() => handleSelect('hard')}
             className="bg-emerald-900/80 hover:bg-emerald-800 border-2 border-red-500/60 hover:border-red-400 rounded-xl p-6 cursor-pointer transition-all transform hover:-translate-y-1 shadow-lg flex flex-col items-center text-center group"
@@ -62,7 +59,7 @@ export default function MapSelectModal() {
             <span className="text-xs uppercase px-2 py-0.5 bg-red-800 text-red-200 rounded-full mb-4">어려움 (Hard)</span>
             <ul className="text-xs text-red-300 space-y-1 text-left w-full bg-emerald-950/60 p-3 rounded-lg border border-emerald-800">
               <li>• 짧고 빠른 지그재그 경로</li>
-              <li>• 시작 골드: 400G</li>
+              <li>• 시작 골드: 500G</li>
               <li>• 초기 체력: 50 HP</li>
               <li>• 타워 비용: 115% / 속도 110%</li>
             </ul>

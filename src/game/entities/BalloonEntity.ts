@@ -54,7 +54,7 @@ export function updateBalloonPosition(
       balloon.isFrozen = false;
       balloon.freezeDuration = 0;
     }
-    return false; // Reached end: false
+    return false;
   }
 
   if (waypoints.length < 2) return false;
@@ -105,7 +105,9 @@ export function drawBalloon(ctx: CanvasRenderingContext2D, balloon: BalloonEntit
   const spec = BALLOON_SPECS[balloon.type];
   let radius = 14;
   if (balloon.type === 'ceramic') radius = 18;
-  if (balloon.type === 'moab') radius = 32;
+  if (balloon.type === 'moab') radius = 30;
+  if (balloon.type === 'bfb') radius = 38;
+  if (balloon.type === 'zomg') radius = 46;
 
   ctx.beginPath();
   ctx.arc(0, 0, radius, 0, Math.PI * 2);
@@ -123,7 +125,13 @@ export function drawBalloon(ctx: CanvasRenderingContext2D, balloon: BalloonEntit
     ctx.stroke();
   }
 
-  if (balloon.maxHp > 1 || balloon.type === 'ceramic' || balloon.type === 'moab') {
+  if (
+    balloon.maxHp > 1 ||
+    balloon.type === 'ceramic' ||
+    balloon.type === 'moab' ||
+    balloon.type === 'bfb' ||
+    balloon.type === 'zomg'
+  ) {
     ctx.fillStyle = '#ffffff';
     ctx.font = 'bold 10px sans-serif';
     ctx.textAlign = 'center';

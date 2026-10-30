@@ -1,83 +1,67 @@
 import { BalloonType, WaveSpawnItem } from '../types/game';
 
 export function getWaveSpawns(wave: number): WaveSpawnItem[] {
-  if (wave <= 5) {
-    const redCount = 10 + wave * 5;
-    const blueCount = wave >= 3 ? (wave - 2) * 4 : 0;
-    const spawns: WaveSpawnItem[] = [{ type: 'red', count: redCount, interval: 0.8 }];
-    if (blueCount > 0) {
-      spawns.push({ type: 'blue', count: blueCount, interval: 1.0 });
-    }
+  if (wave <= 20) {
+    const redCount = 8 + wave * 3;
+    const blueCount = wave >= 3 ? (wave - 2) * 3 : 0;
+    const leadCount = wave >= 10 ? (wave - 9) * 2 : 0;
+    const spawns: WaveSpawnItem[] = [{ type: 'red', count: redCount, interval: 0.7 }];
+    if (blueCount > 0) spawns.push({ type: 'blue', count: blueCount, interval: 0.8 });
+    if (leadCount > 0) spawns.push({ type: 'lead', count: leadCount, interval: 1.0 });
     return spawns;
   }
 
-  if (wave <= 10) {
-    const greenCount = (wave - 5) * 6;
-    const yellowCount = wave >= 8 ? (wave - 7) * 5 : 0;
+  if (wave <= 50) {
+    const ceramicCount = (wave - 20) * 2;
+    const bfbCount = wave >= 50 ? 1 : wave >= 40 ? 1 : 0;
     const spawns: WaveSpawnItem[] = [
-      { type: 'blue', count: 15, interval: 0.6 },
-      { type: 'green', count: greenCount, interval: 0.7 },
+      { type: 'yellow', count: 20 + wave, interval: 0.4 },
+      { type: 'lead', count: 10, interval: 0.8 },
+      { type: 'ceramic', count: ceramicCount, interval: 1.0 },
     ];
-    if (yellowCount > 0) {
-      spawns.push({ type: 'yellow', count: yellowCount, interval: 0.6 });
+    if (bfbCount > 0) {
+      spawns.push({ type: 'bfb', count: bfbCount, interval: 3.0 });
     }
     return spawns;
   }
 
-  if (wave <= 18) {
-    const hasLead = wave >= 15;
-    const spawns: WaveSpawnItem[] = [
-      { type: 'yellow', count: 20 + (wave - 10) * 3, interval: 0.5 },
-      { type: 'green', count: 15, interval: 0.6 },
-    ];
-    if (hasLead) {
-      spawns.push({ type: 'lead', count: (wave - 14) * 3, interval: 1.2 });
-    }
-    return spawns;
-  }
-
-  if (wave <= 24) {
+  if (wave <= 99) {
+    const moabCount = 2 + Math.floor((wave - 50) / 10);
+    const bfbCount = 1 + Math.floor((wave - 50) / 15);
     return [
-      { type: 'lead', count: 8 + (wave - 18) * 2, interval: 1.0 },
-      { type: 'yellow', count: 30, interval: 0.4 },
-      { type: 'ceramic', count: (wave - 18) * 2, interval: 1.5 },
+      { type: 'ceramic', count: 30, interval: 0.6 },
+      { type: 'moab', count: moabCount, interval: 2.0 },
+      { type: 'bfb', count: bfbCount, interval: 3.5 },
     ];
   }
 
-  if (wave <= 29) {
+  if (wave === 100) {
     return [
-      { type: 'ceramic', count: 10 + (wave - 24) * 4, interval: 1.0 },
-      { type: 'lead', count: 15, interval: 0.8 },
-      { type: 'yellow', count: 25, interval: 0.3 },
+      { type: 'ceramic', count: 40, interval: 0.5 },
+      { type: 'moab', count: 5, interval: 1.5 },
+      { type: 'bfb', count: 3, interval: 2.5 },
+      { type: 'zomg', count: 1, interval: 4.0 },
     ];
   }
 
-  if (wave === 30) {
-    return [
-      { type: 'lead', count: 10, interval: 0.6 },
-      { type: 'ceramic', count: 15, interval: 0.8 },
-      { type: 'moab', count: 1, interval: 3.0 },
-    ];
-  }
-
-  // 무한 모드 (Freeplay 31+)
-  const extraWaves = wave - 30;
-  const moabCount = 1 + Math.floor(extraWaves / 3);
-  const ceramicCount = 15 + extraWaves * 3;
-  const leadCount = 10 + extraWaves * 2;
+  // 무한 모드 (Freeplay 101+)
+  const extraWaves = wave - 100;
+  const zomgCount = 1 + Math.floor(extraWaves / 5);
+  const bfbCount = 2 + Math.floor(extraWaves / 3);
+  const moabCount = 5 + extraWaves;
 
   return [
-    { type: 'lead', count: leadCount, interval: 0.6 },
-    { type: 'ceramic', count: ceramicCount, interval: 0.7 },
-    { type: 'moab', count: moabCount, interval: 2.0 },
+    { type: 'moab', count: moabCount, interval: 1.0 },
+    { type: 'bfb', count: bfbCount, interval: 2.0 },
+    { type: 'zomg', count: zomgCount, interval: 3.0 },
   ];
 }
 
 export function getFreeplayMultiplier(wave: number): { hpMultiplier: number; speedMultiplier: number } {
-  if (wave <= 30) {
+  if (wave <= 100) {
     return { hpMultiplier: 1.0, speedMultiplier: 1.0 };
   }
-  const extra = wave - 30;
+  const extra = wave - 100;
   // 체력 매 라운드 15% 증가, 속도 매 라운드 5% 증가
   const hpMultiplier = Math.pow(1.15, extra);
   const speedMultiplier = Math.pow(1.05, extra);

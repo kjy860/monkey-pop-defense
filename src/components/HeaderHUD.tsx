@@ -20,7 +20,6 @@ export default function HeaderHUD() {
 
   return (
     <header className="h-16 bg-panel border-b border-emerald-800 flex items-center justify-between px-6 select-none z-20 shadow-md">
-      {/* 좌측: 생명력 및 골드 */}
       <div className="flex items-center space-x-6">
         <div className="flex items-center space-x-2 bg-emerald-950/60 px-3 py-1.5 rounded-lg border border-emerald-700/50">
           <Heart className="w-5 h-5 text-red-500 fill-red-500 animate-pulse" />
@@ -35,16 +34,13 @@ export default function HeaderHUD() {
         </div>
       </div>
 
-      {/* 중앙: 라운드 표시 */}
       <div className="flex items-center space-x-3 bg-emerald-950/80 px-5 py-1.5 rounded-full border border-emerald-600/60 shadow-inner">
         <span className="text-emerald-300 font-semibold text-sm uppercase tracking-wider">
-          {wave > 30 ? `Freeplay Round ${wave}` : `Round ${wave} / 30`}
+          {wave > 100 ? `Freeplay Round ${wave}` : `Round ${wave} / 100`}
         </span>
       </div>
 
-      {/* 우측: 게임 제어 버튼 (속도, 일시정지, 음소거) */}
       <div className="flex items-center space-x-3">
-        {/* 음소거 버튼 */}
         <button
           onClick={toggleSound}
           className="p-2 rounded-lg bg-emerald-900 hover:bg-emerald-800 border border-emerald-700 text-white transition-colors focus:outline-none"
@@ -53,7 +49,6 @@ export default function HeaderHUD() {
           {soundMuted ? <VolumeX className="w-5 h-5 text-red-400" /> : <Volume2 className="w-5 h-5 text-emerald-300" />}
         </button>
 
-        {/* 배속 토글 버튼 */}
         <button
           onClick={() => setGameSpeed(gameSpeed === 1 ? 2 : 1)}
           className={`flex items-center space-x-1 px-3 py-2 rounded-lg font-bold text-sm border transition-colors ${
@@ -67,7 +62,6 @@ export default function HeaderHUD() {
           <span>{gameSpeed}x</span>
         </button>
 
-        {/* 일시정지 / 시작 토글 버튼 */}
         {gameState === 'playing' || gameState === 'paused' ? (
           <button
             onClick={togglePause}

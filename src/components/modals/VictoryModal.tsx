@@ -4,7 +4,7 @@ import { useRecordStore } from '../../store/useRecordStore';
 import { Trophy, Play, Home } from 'lucide-react';
 
 export default function VictoryModal() {
-  const { wave, difficulty, resetToMapSelect, startWave, setWave } = useGameStore();
+  const { wave, difficulty, resetToMapSelect } = useGameStore();
   const { updateRecord } = useRecordStore();
 
   React.useEffect(() => {
@@ -12,7 +12,7 @@ export default function VictoryModal() {
   }, [difficulty, wave, updateRecord]);
 
   const handleContinueFreeplay = () => {
-    useGameStore.setState({ gameState: 'playing', wave: 31 });
+    useGameStore.setState({ gameState: 'playing', wave: 101 });
   };
 
   const handleGoMain = () => {
@@ -30,10 +30,10 @@ export default function VictoryModal() {
 
         <div className="space-y-2">
           <h2 className="text-3xl font-extrabold text-amber-300 tracking-wide">
-            승리했습니다!
+            축하합니다! 100스테이지를 방어했습니다.
           </h2>
           <p className="text-emerald-200 text-sm leading-relaxed">
-            축하합니다! 30스테이지를 성공적으로 방어하고 MOAB 비행선을 격파했습니다.
+            모든 웨이브를 성공적으로 방어하고 최종 보스 ZOMG를 격파했습니다.
           </p>
         </div>
 
@@ -44,7 +44,7 @@ export default function VictoryModal() {
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-gray-300">최종 라운드</span>
-            <span className="font-bold text-white">Round 30 클리어</span>
+            <span className="font-bold text-white">Round 100 클리어</span>
           </div>
         </div>
 

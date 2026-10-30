@@ -48,7 +48,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   mapConfig: MAP_CONFIGS.normal,
   hp: 100,
   maxHp: 100,
-  gold: 500,
+  gold: 600,
   wave: 0,
   score: 0,
   gameSpeed: 1,
@@ -115,14 +115,19 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   endWave: () => {
     const { wave, autoStart } = get();
-    // 30라운드 완료 시 승리 모달 표시 (단, 무한 모드 31+ 에서는 계속 진행)
-    if (wave === 30) {
+    if (wave === 100) {
       set({ gameState: 'victory' });
       return;
     }
 
     if (autoStart) {
-      set({ gameState: 'playing', wave: wave + 1 });
+      setTimeout(() => {
+        const currentState = get();
+        if (currentState.gameState === 'wave_ready') {
+          set({ gameState: 'playing', wave: currentState.wave + 1 });
+        }
+      }, 1000);
+      set({ gameState: 'wave_ready' });
     } else {
       set({ gameState: 'wave_ready' });
     }
@@ -204,7 +209,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         nextDamage = 4;
       }
     } else {
-      return false; // Max level reached
+      return false;
     }
 
     if (spendGold(upgradeCost)) {
@@ -246,7 +251,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   checkVictory: () => {
     const { wave } = get();
-    if (wave === 30) {
+    if (wave === 100) {
       set({ gameState: 'victory' });
     }
   },

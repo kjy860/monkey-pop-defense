@@ -1,6 +1,6 @@
 # 몽키 팝 디펜스 (Monkey Pop Defense) — 기술·데이터 설계
 
-> 문서 버전 v7 · 완성도 100% · 마지막 수정 2026. 10. 30. 10시 18분 41초
+> 문서 버전 v8 · 완성도 100% · 마지막 수정 2026. 10. 30. 10시 47분 7초
 > 이 문서만 보고 AI(또는 개발자)가 개발해도 거의 같은 결과가 나오도록 작성되었습니다.
 
 ## 기본 정보
@@ -16,11 +16,9 @@
 ## 1. 데이터 모델
 
 ### 클라이언트 로컬 저장소 스키마 (`localStorage.getItem('monkey_pop_record')`)
-별도 서버 없이 브라우저 로컬 스토리지만 사용하여 플레이 기록을 영구 보존합니다.
-
 ```typescript
 interface GameSaveRecord {
-  highestRoundCleared: number; // 전체 최고 클리어 라운드
+  highestRoundCleared: number; // 전체 최고 클리어 라운드 (최대 100+)
   difficultyRecords: {
     easy: { cleared: boolean; highestFreeplayRound: number };
     normal: { cleared: boolean; highestFreeplayRound: number };
@@ -31,18 +29,9 @@ interface GameSaveRecord {
 ```
 
 ### 인게임 런타임 엔티티 모델
-- **MapConfig**:
-  - `id`: 'grass' | 'desert' | 'volcano'
-  - `waypoints`: Array<{ x: number; y: number }>
-  - `bgTheme`: string
-- **Tower**:
-  - `id`: string, `type`: 'dart' | 'tack' | 'bomb' | 'ice'
-  - `x`: number, `y`: number, `range`: number, `damage`: number
-  - `attackSpeed`: number, `level`: number, `totalInvested`: number
-- **Balloon**:
-  - `id`: string, `type`: 'red' | 'blue' | 'green' | 'yellow' | 'lead' | 'ceramic' | 'moab'
-  - `hp`: number, `maxHp`: number, `speed`: number, `pathProgress`: number (0.0 ~ 1.0)
-  - `isImmuneToSharp`: boolean, `isFrozen`: boolean, `freezeDuration`: number
+- **MapConfig**: `id`, `waypoints`, `bgTheme`
+- **Tower**: `id`, `type`, `x`, `y`, `range`, `damage`, `attackSpeed`, `level`, `totalInvested`
+- **Balloon**: `id`, `type` ('red'|'blue'|'green'|'yellow'|'lead'|'ceramic'|'moab'|'bfb'|'zomg'), `hp`, `maxHp`, `speed`, `pathProgress`, `isImmuneToSharp`, `isFrozen`
 
 ## 2. 기술 스택과 폴더 구조
 
@@ -112,6 +101,7 @@ monkey-pop-defense/
 
 | 버전 | 일시 | 변경 내용 |
 | --- | --- | --- |
+| v8 | 2026. 10. 30. 10시 45분 31초 | 라운드를 100까지 확장하고, 골드 획득량을 늘려 타워 설치/업그레이드 재미를 강화하며, 자동 웨이브 시작 버그 수정 및 타워 레벨별 시각 이펙트 강화 규칙 추가 |
 | v7 | 2026. 10. 30. 9시 46분 59초 | 최종 감수: 최종 감수 완료: 모든 섹션의 기능 명세, 데이터 모델, UI 구성 및 수용 기준 일치성을 검증하고 개발 준비를 완료했습니다. |
 | v6 | 2026. 10. 29. 17시 42분 37초 | 최종 감수: 최종 감수 완료: 모든 개발 스펙(타워/풍선/웨이브/화면/테스트) 정합성 검증 및 개발 준비(ready=true) 완료 |
 | v5 | 2026. 10. 29. 17시 22분 7초 | 최종 감수: 최종 감수 완료: 전 섹션 수치 및 상성 규칙 모순 검증, 폴더 구조 및 수용 기준 구체화, 개발 시작 가능한 상태(ready=true) 전환 |

@@ -6,7 +6,7 @@ describe('난이도 및 전용 맵 설정 검증', () => {
     const config = MAP_CONFIGS.easy;
     expect(config.id).toBe('grass');
     expect(config.name).toBe('초원 구불길');
-    expect(config.startGold).toBe(650);
+    expect(config.startGold).toBe(750);
     expect(config.startHp).toBe(150);
     expect(config.enemySpeedMultiplier).toBe(0.9);
     expect(config.towerCostMultiplier).toBe(1.0);
@@ -17,7 +17,7 @@ describe('난이도 및 전용 맵 설정 검증', () => {
     const config = MAP_CONFIGS.normal;
     expect(config.id).toBe('desert');
     expect(config.name).toBe('사막 오아시스');
-    expect(config.startGold).toBe(500);
+    expect(config.startGold).toBe(600);
     expect(config.startHp).toBe(100);
     expect(config.enemySpeedMultiplier).toBe(1.0);
     expect(config.towerCostMultiplier).toBe(1.0);
@@ -28,7 +28,7 @@ describe('난이도 및 전용 맵 설정 검증', () => {
     const config = MAP_CONFIGS.hard;
     expect(config.id).toBe('volcano');
     expect(config.name).toBe('화산 능선');
-    expect(config.startGold).toBe(400);
+    expect(config.startGold).toBe(500);
     expect(config.startHp).toBe(50);
     expect(config.enemySpeedMultiplier).toBe(1.1);
     expect(config.towerCostMultiplier).toBe(1.15);

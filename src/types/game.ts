@@ -4,7 +4,7 @@ export type MapThemeId = 'grass' | 'desert' | 'volcano';
 
 export type TowerType = 'dart' | 'tack' | 'bomb' | 'ice';
 
-export type BalloonType = 'red' | 'blue' | 'green' | 'yellow' | 'lead' | 'ceramic' | 'moab';
+export type BalloonType = 'red' | 'blue' | 'green' | 'yellow' | 'lead' | 'ceramic' | 'moab' | 'bfb' | 'zomg';
 
 export type GameState = 'map_select' | 'wave_ready' | 'playing' | 'paused' | 'victory' | 'game_over';
 

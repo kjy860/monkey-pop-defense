@@ -1,4 +1,4 @@
-import { Balloon, Projectile, Particle, Tower } from '../types/game';
+import { Balloon, Projectile, Particle, Tower, BalloonType } from '../types/game';
 import { BalloonEntity, createBalloon, updateBalloonPosition } from './entities/BalloonEntity';
 import { updateProjectiles } from './entities/ProjectileEntity';
 import { createParticles, updateParticles } from './entities/ParticleEntity';
@@ -17,7 +17,7 @@ export class GameEngine {
   public projectiles: Projectile[] = [];
   public particles: Particle[] = [];
 
-  private spawnQueue: Array<{ type: any; time: number }> = [];
+  private spawnQueue: Array<{ type: BalloonType; time: number }> = [];
   private waveStartTime: number = 0;
   private isSpawning: boolean = false;
 
@@ -125,6 +125,8 @@ export class GameEngine {
         else if (b.type === 'lead') dmg = 2;
         else if (b.type === 'ceramic') dmg = 5;
         else if (b.type === 'moab') dmg = 25;
+        else if (b.type === 'bfb') dmg = 50;
+        else if (b.type === 'zomg') dmg = 100;
         this.onTakeDamage(dmg);
       } else {
         remainingBalloons.push(b);
@@ -137,7 +139,6 @@ export class GameEngine {
     for (const tower of towers) {
       if (now - tower.lastAttackTime >= tower.attackSpeed / gameSpeed) {
         if (tower.type === 'tack') {
-          // 압정 타워 주변 광역 공격
           let attacked = false;
           const directions = tower.level >= 2 
             ? [0, Math.PI/6, Math.PI/3, Math.PI/2, (2*Math.PI)/3, (5*Math.PI)/6, Math.PI, (7*Math.PI)/6, (4*Math.PI)/3, (3*Math.PI)/2, (5*Math.PI)/3, (11*Math.PI)/6]
@@ -164,9 +165,11 @@ export class GameEngine {
           if (attacked) {
             tower.lastAttackTime = now;
             soundSynth.playPop(1.2);
+            for (let i = 0; i < 4; i++) {
+              this.particles.push(...createParticles(tower.x, tower.y, '#FFB703', 1));
+            }
           }
         } else if (tower.type === 'ice') {
-          // 얼음 원숭이 냉기 파동
           let frozenAny = false;
           for (const b of this.balloons) {
             if (distance(tower.x, tower.y, b.x, b.y) <= tower.range) {
@@ -183,7 +186,7 @@ export class GameEngine {
             }
           }
         } else {
-          // 다트 및 폭탄 타워: 사거리 내 첫 번째/가장 진전된 적 조준
+          // 다트 및 폭탄 타워
           let target: BalloonEntity | null = null;
           let maxDist = -1;
           for (const b of this.balloons) {
@@ -198,24 +201,49 @@ export class GameEngine {
 
           if (target) {
             tower.lastAttackTime = now;
-            const projId = `proj_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
             const isBomb = tower.type === 'bomb';
             const blastRad = tower.level >= 2 ? 95 : 60;
-            const dmg = tower.type === 'bomb' ? tower.damage : 1;
+            const dmg = isBomb ? tower.damage : 1;
 
-            this.projectiles.push({
-              id: projId,
-              x: tower.x,
-              y: tower.y,
-              targetX: target.x,
-              targetY: target.y,
-              speed: isBomb ? 300 : 500,
-              damage: dmg,
-              isSharp: !isBomb,
-              isExplosive: isBomb,
-              blastRadius: blastRad,
-              targetBalloonId: target.id,
-            });
+            if (tower.type === 'dart' && tower.level === 3) {
+              // Lv3 다트 산탄 3발
+              const baseAngle = Math.atan2(target.y - tower.y, target.x - tower.x);
+              const angles = [baseAngle - 0.2, baseAngle, baseAngle + 0.2];
+              for (const ang of angles) {
+                this.projectiles.push({
+                  id: `proj_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`,
+                  x: tower.x,
+                  y: tower.y,
+                  targetX: tower.x + Math.cos(ang) * tower.range,
+                  targetY: tower.y + Math.sin(ang) * tower.range,
+                  speed: 550,
+                  damage: dmg,
+                  isSharp: true,
+                  isExplosive: false,
+                  blastRadius: 0,
+                  dx: Math.cos(ang),
+                  dy: Math.sin(ang),
+                });
+              }
+              for (let i = 0; i < 3; i++) {
+                this.particles.push(...createParticles(tower.x, tower.y, '#FFFFFF', 1));
+              }
+            } else {
+              const projId = `proj_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
+              this.projectiles.push({
+                id: projId,
+                x: tower.x,
+                y: tower.y,
+                targetX: target.x,
+                targetY: target.y,
+                speed: isBomb ? 300 : 500,
+                damage: dmg,
+                isSharp: !isBomb,
+                isExplosive: isBomb,
+                blastRadius: blastRad,
+                targetBalloonId: target.id,
+              });
+            }
           }
         }
       }
@@ -257,7 +285,7 @@ export class GameEngine {
     // 5. 파티클 업데이트
     this.particles = updateParticles(this.particles, deltaTime, gameSpeed);
 
-    // 6. 웨이브 클리어 체크
+    // 6. 웨이브 클리어 체크 (엄격한 정산 분리 로직)
     if (!this.isSpawning && this.balloons.length === 0 && this.spawnQueue.length === 0) {
       this.onEndWave();
     }
@@ -274,9 +302,8 @@ export class GameEngine {
 
     const balloon = this.balloons[idx];
 
-    // 납 풍선 상성 검증 (날카로운 공격 면역)
     if (balloon.type === 'lead' && isSharp) {
-      return; // 면역
+      return; // 납 풍선 면역
     }
 
     balloon.hp -= damage;
@@ -287,10 +314,9 @@ export class GameEngine {
       const spec = BALLOON_SPECS[balloon.type];
       this.onAddGold(spec.gold);
 
-      // 분열 처리 (아이 자식 풍선 생성)
       const newBalloons: BalloonEntity[] = [];
       if (spec.children) {
-        const childType = spec.children as any;
+        const childType = spec.children as BalloonType;
         const count = spec.childrenCount;
         const { hpMultiplier, speedMultiplier } = getFreeplayMultiplier(wave);
 
@@ -315,11 +341,9 @@ export class GameEngine {
     const { width, height } = this.canvas;
     this.ctx.clearRect(0, 0, width, height);
 
-    // 1. 배경 렌더링
     this.ctx.fillStyle = mapConfig.bgTheme;
     this.ctx.fillRect(0, 0, width, height);
 
-    // 2. 트랙(경로) 렌더링
     const waypoints = mapConfig.waypoints;
     if (waypoints.length >= 2) {
       this.ctx.beginPath();
@@ -333,13 +357,11 @@ export class GameEngine {
       this.ctx.lineJoin = 'round';
       this.ctx.stroke();
 
-      // 트랙 테두리
       this.ctx.strokeStyle = '#000000';
       this.ctx.lineWidth = 2;
       this.ctx.stroke();
     }
 
-    // 3. 타워 렌더링
     const state = this.getStoreState();
     const selectedId = state.selectedTowerId;
 
@@ -358,6 +380,26 @@ export class GameEngine {
         this.ctx.setLineDash([4, 4]);
         this.ctx.stroke();
         this.ctx.setLineDash([]);
+      }
+
+      if (tower.level >= 2) {
+        this.ctx.beginPath();
+        this.ctx.arc(0, 0, 28 + (tower.level === 3 ? 6 : 0), 0, Math.PI * 2);
+        this.ctx.strokeStyle = tower.level === 3 ? '#FFB703' : '#48CAE4';
+        this.ctx.lineWidth = tower.level === 3 ? 3 : 2;
+        this.ctx.setLineDash(tower.level === 3 ? [2, 2] : []);
+        this.ctx.stroke();
+        this.ctx.setLineDash([]);
+      }
+
+      if (tower.type === 'ice' && tower.level === 3) {
+        this.ctx.beginPath();
+        this.ctx.arc(0, 0, tower.range * 0.8, 0, Math.PI * 2);
+        this.ctx.fillStyle = 'rgba(72, 202, 228, 0.1)';
+        this.ctx.fill();
+        this.ctx.strokeStyle = 'rgba(72, 202, 228, 0.4)';
+        this.ctx.lineWidth = 1.5;
+        this.ctx.stroke();
       }
 
       this.ctx.beginPath();
@@ -382,13 +424,12 @@ export class GameEngine {
       if (tower.level > 1) {
         this.ctx.fillStyle = '#FFB703';
         this.ctx.font = 'bold 12px sans-serif';
-        this.ctx.fillText(`Lv.${tower.level}`, 0, -26);
+        this.ctx.fillText(`Lv.${tower.level}`, 0, -28);
       }
 
       this.ctx.restore();
     }
 
-    // 4. 풍선 렌더링
     for (const b of this.balloons) {
       this.ctx.save();
       this.ctx.translate(b.x, b.y);
@@ -396,7 +437,9 @@ export class GameEngine {
       const spec = BALLOON_SPECS[b.type];
       let radius = 14;
       if (b.type === 'ceramic') radius = 18;
-      if (b.type === 'moab') radius = 32;
+      if (b.type === 'moab') radius = 30;
+      if (b.type === 'bfb') radius = 38;
+      if (b.type === 'zomg') radius = 46;
 
       this.ctx.beginPath();
       this.ctx.arc(0, 0, radius, 0, Math.PI * 2);
@@ -414,7 +457,13 @@ export class GameEngine {
         this.ctx.stroke();
       }
 
-      if (b.maxHp > 1 || b.type === 'ceramic' || b.type === 'moab') {
+      if (
+        b.maxHp > 1 ||
+        b.type === 'ceramic' ||
+        b.type === 'moab' ||
+        b.type === 'bfb' ||
+        b.type === 'zomg'
+      ) {
         this.ctx.fillStyle = '#ffffff';
         this.ctx.font = 'bold 10px sans-serif';
         this.ctx.textAlign = 'center';
@@ -425,11 +474,10 @@ export class GameEngine {
       this.ctx.restore();
     }
 
-    // 5. 투사체 렌더링
     for (const proj of this.projectiles) {
       this.ctx.save();
       this.ctx.beginPath();
-      this.ctx.arc(proj.x, proj.y, proj.isExplosive ? 6 : 4, 0, Math.PI * 2);
+      this.ctx.arc(proj.x, proj.y, proj.isExplosive ? 6 : proj.isShard ? 5 : 4, 0, Math.PI * 2);
       this.ctx.fillStyle = proj.isExplosive ? '#D90429' : proj.isShard ? '#FFB703' : '#FFFFFF';
       this.ctx.fill();
       this.ctx.strokeStyle = '#000000';
@@ -438,7 +486,6 @@ export class GameEngine {
       this.ctx.restore();
     }
 
-    // 6. 파티클 렌더링
     for (const p of this.particles) {
       this.ctx.save();
       const alpha = Math.max(0, p.life / p.maxLife);

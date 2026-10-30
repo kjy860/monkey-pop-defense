@@ -8,17 +8,16 @@ describe('타워 구매, 배치, 업그레이드 및 판매 검증', () => {
     useGameStore.getState().initGame('normal');
   });
 
-  it('보통 난이도 초기 골드 500G에서 다트 원숭이(200G) 구매 시 골드가 300G로 감소하고 타워가 배치된다.', () => {
+  it('보통 난이도 초기 골드 600G에서 다트 원숭이(200G) 구매 시 골드가 400G로 감소하고 타워가 배치된다.', () => {
     const store = useGameStore.getState();
-    expect(store.gold).toBe(500);
+    expect(store.gold).toBe(600);
     expect(store.towers.length).toBe(0);
 
-    // 경로와 겹치지 않는 유효한 타일 좌표 (400, 100)
     const success = store.placeTower('dart', 400, 100);
     expect(success).toBe(true);
 
     const updatedStore = useGameStore.getState();
-    expect(updatedStore.gold).toBe(300);
+    expect(updatedStore.gold).toBe(400);
     expect(updatedStore.towers.length).toBe(1);
     expect(updatedStore.towers[0].type).toBe('dart');
     expect(updatedStore.towers[0].level).toBe(1);
@@ -28,11 +27,9 @@ describe('타워 구매, 배치, 업그레이드 및 판매 검증', () => {
   it('경로 근처나 기존 타워 위치에는 타워를 배치할 수 없다 (충돌 판정 검증)', () => {
     const waypoints = useGameStore.getState().mapConfig.waypoints;
 
-    // 경로 바로 위 좌표 (400, 0)은 트랙 위에 있으므로 너무 가까움
     const isTrackCollision = isTooCloseToTrack(400, 0, waypoints, 30);
     expect(isTrackCollision).toBe(true);
 
-    // 기존 타워와 겹치는 위치 검증
     const existingTowers = [{ x: 300, y: 300 }];
     const isTowerCollision = isCollidingWithOtherTowers(310, 310, existingTowers, 35);
     expect(isTowerCollision).toBe(true);
@@ -45,9 +42,8 @@ describe('타워 구매, 배치, 업그레이드 및 판매 검증', () => {
     const store = useGameStore.getState();
     store.placeTower('dart', 400, 100);
     const towerId = useGameStore.getState().towers[0].id;
-    const goldBeforeUpgrade = useGameStore.getState().gold; // 300G
+    const goldBeforeUpgrade = useGameStore.getState().gold; // 400G
 
-    // 다트 원숭이 Lv2 비용: 120G
     const upgradeSuccess = store.upgradeTower(towerId);
     expect(upgradeSuccess).toBe(true);
 
@@ -60,10 +56,10 @@ describe('타워 구매, 배치, 업그레이드 및 판매 검증', () => {
 
   it('타워 판매 시 투자된 총 누적 골드의 70%가 즉시 환급된다', () => {
     const store = useGameStore.getState();
-    store.placeTower('dart', 400, 100); // 200G 투자, 골드 300G 남음
+    store.placeTower('dart', 400, 100);
     const towerId = useGameStore.getState().towers[0].id;
 
-    store.upgradeTower(towerId); // +120G 투자, 총 투자 320G, 골드 180G 남음
+    store.upgradeTower(towerId);
 
     const goldBeforeSell = useGameStore.getState().gold;
     const invested = useGameStore.getState().towers[0].totalInvested;

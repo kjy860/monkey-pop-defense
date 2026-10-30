@@ -28,6 +28,28 @@ export function drawTower(ctx: CanvasRenderingContext2D, tower: TowerEntity, isS
     ctx.setLineDash([]);
   }
 
+  // 레벨별 화려한 이펙트 렌더링
+  if (tower.level >= 2) {
+    ctx.beginPath();
+    ctx.arc(0, 0, 28 + (tower.level === 3 ? 6 : 0), 0, Math.PI * 2);
+    ctx.strokeStyle = tower.level === 3 ? '#FFB703' : '#48CAE4';
+    ctx.lineWidth = tower.level === 3 ? 3 : 2;
+    ctx.setLineDash(tower.level === 3 ? [2, 2] : []);
+    ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  // 얼음 타워 눈보라 오라 (Lv.3)
+  if (tower.type === 'ice' && tower.level === 3) {
+    ctx.beginPath();
+    ctx.arc(0, 0, tower.range * 0.8, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(72, 202, 228, 0.1)';
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(72, 202, 228, 0.4)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+  }
+
   ctx.beginPath();
   ctx.arc(0, 0, 22, 0, Math.PI * 2);
   ctx.fillStyle = '#1b4332';
@@ -50,7 +72,7 @@ export function drawTower(ctx: CanvasRenderingContext2D, tower: TowerEntity, isS
   if (tower.level > 1) {
     ctx.fillStyle = '#FFB703';
     ctx.font = 'bold 12px sans-serif';
-    ctx.fillText(`Lv.${tower.level}`, 0, -26);
+    ctx.fillText(`Lv.${tower.level}`, 0, -28);
   }
 
   ctx.restore();
