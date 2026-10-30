@@ -29,7 +29,7 @@ export default function MapSelectModal() {
             <span className="text-xs uppercase px-2 py-0.5 bg-emerald-700 text-emerald-200 rounded-full mb-4">쉬움 (Easy)</span>
             <ul className="text-xs text-emerald-300 space-y-1 text-left w-full bg-emerald-950/60 p-3 rounded-lg border border-emerald-800">
               <li>• 긴 단일 S자 곡선 경로</li>
-              <li>• 시작 골드: 750G</li>
+              <li>• 시작 골드: 1,200G</li>
               <li>• 초기 체력: 150 HP</li>
               <li>• 적 이동속도: 90%</li>
             </ul>
@@ -44,7 +44,7 @@ export default function MapSelectModal() {
             <span className="text-xs uppercase px-2 py-0.5 bg-amber-700 text-amber-200 rounded-full mb-4">보통 (Normal)</span>
             <ul className="text-xs text-amber-300 space-y-1 text-left w-full bg-emerald-950/60 p-3 rounded-lg border border-emerald-800">
               <li>• 2중 루프 교차 사격 맵</li>
-              <li>• 시작 골드: 600G</li>
+              <li>• 시작 골드: 1,000G</li>
               <li>• 초기 체력: 100 HP</li>
               <li>• 적 이동속도: 100%</li>
             </ul>
@@ -59,7 +59,7 @@ export default function MapSelectModal() {
             <span className="text-xs uppercase px-2 py-0.5 bg-red-800 text-red-200 rounded-full mb-4">어려움 (Hard)</span>
             <ul className="text-xs text-red-300 space-y-1 text-left w-full bg-emerald-950/60 p-3 rounded-lg border border-emerald-800">
               <li>• 짧고 빠른 지그재그 경로</li>
-              <li>• 시작 골드: 500G</li>
+              <li>• 시작 골드: 800G</li>
               <li>• 초기 체력: 50 HP</li>
               <li>• 타워 비용: 115% / 속도 110%</li>
             </ul>

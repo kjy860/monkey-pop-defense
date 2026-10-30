@@ -8,20 +8,20 @@ describe('타워 구매, 배치, 업그레이드 및 판매 검증', () => {
     useGameStore.getState().initGame('normal');
   });
 
-  it('보통 난이도 초기 골드 850G에서 다트 원숭이(200G) 구매 시 골드가 650G로 감소하고 타워가 배치된다.', () => {
+  it('보통 난이도 초기 골드 1000G에서 다트 원숭이(250G) 구매 시 골드가 750G로 감소하고 타워가 배치된다.', () => {
     const store = useGameStore.getState();
-    expect(store.gold).toBe(850);
+    expect(store.gold).toBe(1000);
     expect(store.towers.length).toBe(0);
 
     const success = store.placeTower('dart', 400, 100);
     expect(success).toBe(true);
 
     const updatedStore = useGameStore.getState();
-    expect(updatedStore.gold).toBe(650);
+    expect(updatedStore.gold).toBe(750);
     expect(updatedStore.towers.length).toBe(1);
     expect(updatedStore.towers[0].type).toBe('dart');
     expect(updatedStore.towers[0].level).toBe(1);
-    expect(updatedStore.towers[0].totalInvested).toBe(200);
+    expect(updatedStore.towers[0].totalInvested).toBe(250);
   });
 
   it('경로 근처나 기존 타워 위치에는 타워를 배치할 수 없다 (충돌 판정 검증)', () => {
@@ -42,7 +42,7 @@ describe('타워 구매, 배치, 업그레이드 및 판매 검증', () => {
     const store = useGameStore.getState();
     store.placeTower('dart', 400, 100);
     const towerId = useGameStore.getState().towers[0].id;
-    const goldBeforeUpgrade = useGameStore.getState().gold; // 650G
+    const goldBeforeUpgrade = useGameStore.getState().gold; // 750G
 
     const upgradeSuccess = store.upgradeTower(towerId);
     expect(upgradeSuccess).toBe(true);
@@ -50,7 +50,7 @@ describe('타워 구매, 배치, 업그레이드 및 판매 검증', () => {
     const updatedStore = useGameStore.getState();
     const upgradedTower = updatedStore.towers[0];
     expect(upgradedTower.level).toBe(2);
-    expect(upgradedTower.totalInvested).toBe(200 + TOWER_SPECS.dart.lv2Cost);
+    expect(upgradedTower.totalInvested).toBe(250 + TOWER_SPECS.dart.lv2Cost);
     expect(updatedStore.gold).toBe(goldBeforeUpgrade - TOWER_SPECS.dart.lv2Cost);
   });
 
